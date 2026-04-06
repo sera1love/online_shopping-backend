@@ -1,5 +1,5 @@
 public abstract class Product {
-    private static int counter = 1;
+    private static int idgen = 1;
 
     private int id;
     private String title;
@@ -8,7 +8,7 @@ public abstract class Product {
 
     public Product() {}
     public Product(String title, double price, String description) {
-        this.id = counter++; // генерация ID
+        this.id = idgen++; // генерация ID
         this.title = title;
         this.price = price;
         this.description = description;
