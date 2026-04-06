@@ -17,10 +17,12 @@ class Category {
         this.description = description;
     }
 
+    // добавление категорий
     public static void addCategory(Category category) {
         categories.add(category);
     }
 
+    // вывод категорий
     public static void showCategories() {
         for (Category c : categories) {
             System.out.println("ID: " + c.id + " | Категория: " + c.title + " (" + c.description + ")");
