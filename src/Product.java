@@ -14,8 +14,6 @@ public abstract class Product {
         this.description = description;
     }
 
-
-
     // получение id
     public int getID() {
         return this.id;

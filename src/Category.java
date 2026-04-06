@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 class Category {
-    private static int counter = 1;
+    private static int idgen = 1;
 
     private int id;
     private String title;
@@ -12,7 +12,7 @@ class Category {
 
     public Category() {}
     public Category(String title, String description) {
-        this.id = counter++;
+        this.id = idgen++;
         this.title = title;
         this.description = description;
     }
