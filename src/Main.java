@@ -16,35 +16,19 @@ public class Main {
         Electronic lamp = new Electronic("Настольная лампа", 3000, "Светодиодная лампа Xiaomi "
                 + "Leomax Ultra, яркость этой лампы позволит увидеть ближайшие 5 городов!");
 
+        // Добавляем в общий список
+        Catalog.addCategory(phone);
+        Catalog.addCategory(shovel);
+        Catalog.addCategory(lamp);
 
-        // вывод продуктов
-        // телефон
-        System.out.println("Продукт: " + phone.getTitle() + "\n"
-                + " Цена - " + phone.getPrice() + "\n"
-                + " (ID: " + phone.getID() + ")" + "\n"
-                + " Описание: " + phone.getDescription() + "\n");
-
-        // лопата
-        System.out.println("Продукт: " + shovel.getTitle() + "\n"
-                + " Цена - " + shovel.getPrice() + "\n"
-                + " (ID: " + shovel.getID() + ")" + "\n"
-                + " Описание: " + shovel.getDescription() + "\n");
-
-        // лампа
-        System.out.println("Продукт: " + lamp.getTitle() + "\n"
-                + " Цена - " + lamp.getPrice() + "\n"
-                + " (ID: " + lamp.getID() + ")" + "\n"
-                + " Описание: " + lamp.getDescription() + "\n");
+        // Добавляем базовые категории
+        Catalog.addCategory(new Category("Электроника", 0, "Электро-товары"));
+        Catalog.addCategory(new Category("Дача и сад", 0, "Товары для дома и дачи"));
 
 
-
-        // добавление и вывод категорий
-        Category.addCategory(new Category("Мобильные устройства", 0, "Гаджеты и техника"));
-        Category.addCategory(new Category("Электроника", 0, "Гаджеты и техника"));
-        Category.addCategory(new Category("Сад", 0, "Все для дома и дачи"));
-
-        System.out.println("\nСписок категорий:");
-        Category.showCategories();
+        // вывод категорий и товаров
+        System.out.println("Список категорий и товаров:");
+        Catalog.showCategories();
     }
 }
 
@@ -57,3 +41,7 @@ public class Main {
 //  2.5 - создаем новый класс: MobileDevice, должен быть наследником электроники
 //  2.6 - создаем несколько объектов из новых классов в main, добавляем
 //  2.7 - в Category нужно добавить AddCategory, ShowCategory
+
+// TODO - этап 3:
+//  3.1 - нужно создать класс Category (уже есть), добавить ADD_Category, SHOW_Category
+//  3.2 - нужно создать счетчик в Category: 1 - сколько категорий, 2 - сколько sub категорий

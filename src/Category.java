@@ -7,17 +7,23 @@ public class Category {
     private String description;
     private double price;
 
-
-    private static ArrayList<Category> categories = new ArrayList<>();
-
     public Category(String title, double price, String description) {
         this.id = idgen++;
         this.title = title;
-        this.description = description;
         this.price = price;
+        this.description = description;
     }
 
-    // получение id
+    public boolean isSubCategory() {
+        return false;
+    }
+
+    public void printInfo() {
+        System.out.println("[Категория] " + title + " (ID: " + id + ")");
+    }
+
+    // гет сеты
+    // получение ID
     public int getID() {
         return this.id;
     }
@@ -25,20 +31,12 @@ public class Category {
         return this.id = id;
     }
 
-    // получение названий
+    // получение названия
     public String getTitle() {
         return this.title;
     }
     public String setTitle(String title) {
         return this.title = title;
-    }
-
-    // получение цены
-    public double getPrice() {
-        return this.price;
-    }
-    public double setPrice(double price) {
-        return this.price = price;
     }
 
     // получение описания
@@ -49,13 +47,11 @@ public class Category {
         return this.description = description;
     }
 
-    public static void addCategory(Category category) {
-        categories.add(category);
+    // получение цены
+    public double getPrice() {
+        return this.price;
     }
-
-    public static void showCategories() {
-        for (Category c : categories) {
-            System.out.println("ID: " + c.id + " | Название: " + c.title + " | Цена: " + c.description);
-        }
+    public double setPrice(double price) {
+        return this.price = price;
     }
 }

@@ -1,37 +1,24 @@
+import java.util.ArrayList;
+
 public class Catalog {
-    // TODO 1 поле - ID, 2 поле - Title, 3 поле - Price.
+    private static ArrayList<Category> categori = new ArrayList<>();
 
-    private int id;
-    private String title;
-    private double price;
-
-    public Catalog() {}
-    public Catalog(int id, String title, double price) {
-        this.id = id;
-        this.title = title;
-        this.price = price;
+    public static void addCategory(Category category) {
+        categori.add(category);
     }
 
-    // получение id
-    public int getID() {
-        return this.id;
-    }
-    public void setID(int id) {
-        this.id = id;
-    }
+    public static void showCategories() {
+        int catCount = 0;
+        int subCount = 0;
 
-    // получение названия
-    public String getTitle() {
-        return this.title;
-    }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    // получение цены
-    public double getPrice() {
-        return this.price;
-    }
-    public void setPrice(double price) {
-        this.price = price;
+        for (Category c : categori) {
+            // вызов полиморфизного метода
+            c.printInfo();
+
+            // счетчик через полиморфизм
+            if (c.isSubCategory()) subCount++;
+            else catCount++;
+        }
+        System.out.println("\nСтатистика: Категорий - " + catCount + ", Саб-категорий - " + subCount);
     }
 }
