@@ -1,31 +1,61 @@
 import java.util.ArrayList;
 
-class Category {
+public class Category {
     private static int idgen = 1;
-
     private int id;
     private String title;
     private String description;
+    private double price;
 
-    // список для хранения всех категорий
+
     private static ArrayList<Category> categories = new ArrayList<>();
 
-    public Category() {}
-    public Category(String title, String description) {
+    public Category(String title, double price, String description) {
         this.id = idgen++;
         this.title = title;
         this.description = description;
+        this.price = price;
     }
 
-    // добавление категорий
+    // получение id
+    public int getID() {
+        return this.id;
+    }
+    public int setID(int id) {
+        return this.id = id;
+    }
+
+    // получение названий
+    public String getTitle() {
+        return this.title;
+    }
+    public String setTitle(String title) {
+        return this.title = title;
+    }
+
+    // получение цены
+    public double getPrice() {
+        return this.price;
+    }
+    public double setPrice(double price) {
+        return this.price = price;
+    }
+
+    // получение описания
+    public String getDescription() {
+        return this.description;
+    }
+    public String setDescription(String description) {
+        return this.description = description;
+    }
+
     public static void addCategory(Category category) {
         categories.add(category);
     }
 
-    // вывод категорий
     public static void showCategories() {
         for (Category c : categories) {
-            System.out.println("ID: " + c.id + " | Категория: " + c.title + " (" + c.description + ")");
+            System.out.println("ID: " + c.id + " | Название: " + c.title + " | Цена: " + c.description);
         }
     }
 }

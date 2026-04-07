@@ -16,6 +16,7 @@ public class Main {
         Electronic lamp = new Electronic("Настольная лампа", 3000, "Светодиодная лампа Xiaomi "
                 + "Leomax Ultra, яркость этой лампы позволит увидеть ближайшие 5 городов!");
 
+
         // вывод продуктов
         // телефон
         System.out.println("Продукт: " + phone.getTitle() + "\n"
@@ -35,9 +36,12 @@ public class Main {
                 + " (ID: " + lamp.getID() + ")" + "\n"
                 + " Описание: " + lamp.getDescription() + "\n");
 
+
+
         // добавление и вывод категорий
-        Category.addCategory(new Category("Электроника", "Гаджеты и техника"));
-        Category.addCategory(new Category("Сад", "Все для дома и дачи"));
+        Category.addCategory(new Category("Мобильные устройства", 0, "Гаджеты и техника"));
+        Category.addCategory(new Category("Электроника", 0, "Гаджеты и техника"));
+        Category.addCategory(new Category("Сад", 0, "Все для дома и дачи"));
 
         System.out.println("\nСписок категорий:");
         Category.showCategories();
