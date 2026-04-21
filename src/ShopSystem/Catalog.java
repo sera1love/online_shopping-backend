@@ -1,3 +1,5 @@
+package ShopSystem;
+
 import java.util.ArrayList;
 
 public class Catalog {
@@ -12,10 +14,9 @@ public class Catalog {
         int subCount = 0;
 
         for (Category c : categori) {
-            // вызов полиморфизного метода
-            c.printInfo();
+            // вывод через полиморфный метод showInfo
+            c.showInfo();
 
-            // счетчик через полиморфизм
             if (c.isSubCategory()) subCount++;
             else catCount++;
         }
