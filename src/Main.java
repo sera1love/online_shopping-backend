@@ -24,24 +24,24 @@ public class Main {
         Catalog.addCategory(new Category("Электроника", 0, "Электро-товары") {
             @Override
             public void showInfo() {
-                System.out.println("[Категория] " + getTitle() + ", [Описание] " + getDescription() + " (ID: " + getID() + ")");
+                System.out.println(
+                        "[Категория] " + getTitle() +
+                        ", [Описание] " + getDescription() +
+                        " (ID: " + getID() + ")");
             }
         });
         Catalog.addCategory(new Category("Дача и сад", 0, "Товары для дома и дачи") {
             @Override
             public void showInfo() {
-                System.out.println("[Категория] " + getTitle() + ", [Описание] " + getDescription() + " (ID: " + getID() + ")");
+                System.out.println(
+                        "[Категория] " + getTitle() +
+                        ", [Описание] " + getDescription() +
+                        " (ID: " + getID() + ")");
             }
         });
 
 
-        Catalog.showCategories();
-        Product.getProductList();
-
-        System.out.println("\nСравнение:");
-        Electronic lamp2 = new Electronic("Лампа Xiaomi", 3100, "Свет на 5 городов");
-        System.out.println("lamp.equals(lamp2): " + lamp.equals(lamp2));
-        System.out.println("lamp.toString(): " + lamp);
+        Menu.start();
     }
 }
 
@@ -79,3 +79,14 @@ public class Main {
 //   5.2.3 GetFinalStatus - String
 //  5.3 Необходимо все классы расширять с помощью equals, hashCode, toString, insteadof, DON'T REPEAT
 //  5.4 создаете объекты в классах и сравниваете
+
+// TODO - этап 6:
+//  6.1 -
+
+// TODO - этап ХЗ:
+//  хз.1 - добавить сортировку категорий товаров, comparable по возрастанию или по убыванию
+//  хз.2 - надо реализовать компоратор(фильтр по цене/по сезону/по памяти и т.д)
+//  хз.3 - создать пользовательское меню 4 кнопки к примеру:
+//  (проверить категории(саб категории и категории)/проверить товары/
+//  критерии сортировки(убывание, возрастание и т.д)/сравнение товаров)
+//  хз.4 - добавить защиту фильтров, чтобы нельзя было сравнить лопату и смартфон и т.д...

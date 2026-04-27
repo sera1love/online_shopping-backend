@@ -1,23 +1,8 @@
 package ShopSystem;
-import ShopSystem.interface_OJnS.Payable;
 
-public class GardenItem extends Category implements Payable {
+public class GardenItem extends Category {
     public GardenItem(String title, double price, String description) {
         super(title, price, description);
-    }
-
-    @Override
-    public double getFinalPrice() {
-        return getPrice();
-    }
-
-    @Override
-    public void pay(double amount) {
-    }
-
-    @Override
-    public boolean isPaid() {
-        return false;
     }
 
     @Override

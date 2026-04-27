@@ -20,6 +20,12 @@ public class Catalog {
             if (c.isSubCategory()) subCount++;
             else catCount++;
         }
+
+        for (Category c : Product.productList) {
+            if (c.isSubCategory()) subCount++;
+            else catCount++;
+        }
+
         System.out.println("\nСтатистика: Категорий - " + catCount + ", Саб-категорий - " + subCount);
     }
 }
