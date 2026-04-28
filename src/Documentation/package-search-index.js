@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"ShopSystem"},{"l":"ShopSystem.ClientSystem"},{"l":"ShopSystem.comporators"},{"l":"ShopSystem.interface_OJnS"}];updateSearchResults();

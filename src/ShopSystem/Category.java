@@ -1,8 +1,9 @@
 package ShopSystem;
 
+import ShopSystem.interface_OJnS.Payable;
 import java.util.Objects;
 
-public abstract class Category implements Comparable<Category> {
+public abstract class Category implements Comparable<Category>, Payable {
     private static int idgen = 1;
     private int id;
     private String title;

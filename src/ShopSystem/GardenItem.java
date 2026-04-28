@@ -18,4 +18,19 @@ public class GardenItem extends Category {
                 + "Описание: " + getDescription() + "\n "
                 + "Статус оплаты: ");
     }
+
+    @Override
+    public double getFinalPrice() {
+        return 0;
+    }
+
+    @Override
+    public void pay(double amount) {
+
+    }
+
+    @Override
+    public boolean isPaid() {
+        return false;
+    }
 }

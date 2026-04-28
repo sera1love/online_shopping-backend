@@ -6,7 +6,7 @@ public abstract class Product extends Category implements Payable {
 
     // список товаров в виде ArrayList
     public static ArrayList<Category> productList = new ArrayList<>();
-    public static void addProduct(Category product) {
+    public static void addProduct(Category product) { // Теперь принимаем только Product и его наследников
         productList.add(product);
     }
 
