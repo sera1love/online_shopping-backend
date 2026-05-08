@@ -2,7 +2,12 @@ package ShopSystem.ClientSystem;
 
 import ShopSystem.Product;
 import ShopSystem.Category;
+import ShopSystem.interface_OJnS.ClientStatus;
 import ShopSystem.interface_OJnS.Finansable;
+import ShopSystem.interface_OJnS.OrderStatus.OrderStatus;
+import ShopSystem.interface_OJnS.ProductFilter;
+import ShopSystem.interface_OJnS.StatusValidator;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -156,6 +161,59 @@ public class Clients implements Finansable {
         int value = scanner.nextInt();
         scanner.nextLine();
         return Math.max(min, Math.min(max, value));
+    }
+
+    // проверка статуса клиента через лямбду
+    public static boolean checkClientStatus(StatusValidator<ClientStatus> validator) {
+        return client != null && validator.validate(client.getClientStatus());
+    }
+
+    // фильтрация истории покупок по статусу заказа
+    public static void showHistoryByStatus(OrderStatus targetStatus) {
+        if (client == null) {
+            System.out.println("Клиент не инициализирован");
+            return;
+        }
+
+        client.getPurchaseHistory().stream()
+                .filter(record -> record.getOrderStatus() == targetStatus)
+                .forEach(record -> System.out.println("📦 " + record));
+    }
+
+    // 7.4: Расширенное меню фильтров
+    public static void advancedProductFilter() {
+        System.out.println("""
+            \nФильтр товаров:
+            1) Только в наличии
+            2) Только со скидкой
+            3) Цена до 5000р
+            4) Название содержит "введите текст"(ПОКА НЕ РАБОТАЕТ)
+            5) Комбинированный: в наличии + до 10000р
+            0) Назад
+            """);
+
+        int choice = getIntInput("Выбор: ", 0, 5);
+        ProductFilter filter = switch (choice) {
+            case 1 -> p -> p.isInStock();
+            case 2 -> Product::isPaid;
+            case 3 -> p -> p.getPrice() <= 5000;
+            case 4 -> p -> p.getTitle().toLowerCase().contains(" ");
+            case 5 -> ((ProductFilter) Product::isInStock)
+                    .and(p -> p.getPrice() <= 10000);
+            default -> p -> true;
+        };
+
+        List<Product> filtered = Product.productList.stream()
+                .filter(filter)
+                .toList();
+
+        if (filtered.isEmpty()) {
+            System.out.println("Ничего не найдено");
+        } else {
+            System.out.println("\nНайдено товаров: " + filtered.size());
+            filtered.forEach(p -> System.out.printf("• %s — %.0fр%n",
+                    p.getTitle(), p.getFinalPrice()));
+        }
     }
 
     // геттеры
