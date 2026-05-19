@@ -7,6 +7,7 @@ public enum ClientStatus {
     INACTIVE("Неактивен");
 
     private final String label;
+
     ClientStatus(String label) { this.label = label; }
     public String getLabel() { return label; }
 }

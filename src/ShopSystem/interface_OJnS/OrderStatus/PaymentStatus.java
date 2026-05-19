@@ -7,6 +7,7 @@ public enum PaymentStatus {
     FAILED("Ошибка оплаты");
 
     private final String label;
+
     PaymentStatus(String label) { this.label = label; }
     public String getLabel() { return label; }
 }

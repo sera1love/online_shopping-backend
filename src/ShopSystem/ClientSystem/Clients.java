@@ -1,227 +1,127 @@
 package ShopSystem.ClientSystem;
-
 import ShopSystem.Product;
-import ShopSystem.Category;
+import ShopSystem.ShopInventory;
 import ShopSystem.interface_OJnS.ClientStatus;
-import ShopSystem.interface_OJnS.Finansable;
 import ShopSystem.interface_OJnS.OrderStatus.OrderStatus;
 import ShopSystem.interface_OJnS.ProductFilter;
 import ShopSystem.interface_OJnS.StatusValidator;
-
 import java.util.List;
 import java.util.Scanner;
 
-public class Clients implements Finansable {
+public class Clients {
     private static Client client = null;
     private static final Scanner scanner = new Scanner(System.in);
 
-    // инициализация клиента
     public static void initClient() {
-        if (client != null) {
-            System.out.println("Клиент уже инициализирован: " + client.getName());
-            return;
-        }
-
-        System.out.println("\nСоздание покупателя");
-        System.out.print("Имя: ");
-        String name = scanner.nextLine();
-        System.out.print("Телефон: ");
-        String phone = scanner.nextLine();
-
-        System.out.print("Начальный баланс (р): ");
-        double balance = readDouble(0);
+        if (client != null) { System.out.println("Клиент уже создан: " + client.getName()); return; }
+        System.out.println("Создание покупателя");
+        System.out.print("Имя: "); String name = scanner.nextLine();
+        System.out.print("Телефон: "); String phone = scanner.nextLine();
+        System.out.print("Начальный баланс (р): "); double balance = readDouble(0);
         scanner.nextLine();
-
         client = new Client(name, phone, balance);
         System.out.println("Клиент создан: " + client.getName());
     }
 
-    // покупка товаров
     public static boolean buyProduct(Product product) {
-        if (client == null) {
-            System.out.println("Сначала инициализируйте клиента!");
-            return false;
-        }
+        if (client == null) { System.out.println("Сначала инициализируйте клиента!"); return false; }
         return client.buyProduct(product);
     }
 
-    // показать товары для покупки
     public static void showProductsForSale() {
-        if (Product.productList.isEmpty()) {
-            System.out.println("Товаров нет в наличии");
-            return;
-        }
-        System.out.println("\nДоступные товары:");
-        for (int i = 0; i < Product.productList.size(); i++) {
-            Category c = Product.productList.get(i);
-            if (c instanceof Product p) {
-                String status = p.isPaid() ? "ОПЛАЧЕНО" : "В продаже";
-                System.out.printf("%d) %s — %.0fр (%s)%n",
-                        i+1, c.getTitle(), c.getPrice(), status);
-            }
+        if (ShopInventory.getProducts().isEmpty()) { System.out.println("Товаров нет в наличии"); return; }
+        System.out.println("Доступные товары:");
+        for (int i = 0; i < ShopInventory.getProducts().size(); i++) {
+            Product p = ShopInventory.getProducts().get(i);
+            String status = p.isPaid() ? "ОПЛАЧЕНО" : (p.isInStock() ? "В продаже" : "Нет в наличии");
+            System.out.printf("%d) %s - %.0fр (%s)%n", i+1, p.getTitle(), p.getPrice(), status);
         }
     }
 
-    // меню покупок
     public static void purchaseMenu() {
-        if (client == null) {
-            System.out.println("Сначала выполните инициализацию клиента!");
-            return;
-        }
-        System.out.println("\n" + "=".repeat(50));
+        if (client == null) { System.out.println("Сначала выполните инициализацию клиента!"); return; }
         System.out.println("ПОКУПКИ: " + client.getName());
         System.out.println(client.getWallet().getFinalStatus());
-        System.out.println("=".repeat(50));
-
         showProductsForSale();
-        System.out.print("\nВведите номер товара (0 - отмена): ");
-        int choice = getIntInput("", 0, Product.productList.size());
-
-        if (choice > 0 && choice <= Product.productList.size()) {
-            Category selected = Product.productList.get(choice - 1);
-            if (selected instanceof Product product) {
-                buyProduct(product);
-            }
+        System.out.print("Введите номер товара (0 - отмена): ");
+        int choice = getIntInput("", 0, ShopInventory.getProducts().size());
+        if (choice > 0 && choice <= ShopInventory.getProducts().size()) {
+            buyProduct(ShopInventory.getProducts().get(choice - 1));
         }
     }
 
-    // история покупок
     public static void showPurchaseHistory() {
-        if (client == null) {
-            System.out.println("Клиент не инициализирован");
-            return;
-        }
+        if (client == null) { System.out.println("Клиент не создан"); return; }
         List<PurchaseRecord> history = client.getPurchaseHistory();
-        if (history.isEmpty()) {
-            System.out.println("История покупок пуста");
-            return;
-        }
-        System.out.println("\nИстория: " + client.getName());
-        System.out.println("-".repeat(45));
-        double total = 0;
-        for (PurchaseRecord record : history) {
-            System.out.println(record);
-            total += record.getAmount();
-        }
-        System.out.printf("%nВсего: %.2fр%n", total);
+        if (history.isEmpty()) { System.out.println("История покупок пуста"); return; }
+        System.out.println("История: " + client.getName());
+        double total = history.stream().mapToDouble(PurchaseRecord::getAmount).sum();
+        history.forEach(r -> System.out.println("  " + r));
+        System.out.printf("Всего потрачено: %.2fр%n", total);
     }
 
-    // пополнение баланса
     public static void topUpBalance() {
-        if (client == null) {
-            System.out.println("Клиент не инициализирован");
-            return;
-        }
-        System.out.print("\nСумма пополнения (р): ");
-        double amount = readDouble(0);
+        if (client == null) { System.out.println("Клиент не создан"); return; }
+        System.out.print("Сумма пополнения (р): "); double amount = readDouble(0);
         scanner.nextLine();
-
-        if (amount > 0) {
-            client.topUp(amount);
-            System.out.println("Баланс пополнен!");
-            System.out.println(client.getWallet().getFinalStatus());
-        } else {
-            System.out.println("Сумма должна быть > 0");
-        }
+        if (amount > 0) { client.topUp(amount); System.out.println(client.getWallet().getFinalStatus()); }
     }
 
-    // реализация Finansable
-    @Override
-    public double checkBalance() {
-        return client != null ? client.getWallet().checkBalance() : 0;
-    }
-
-    @Override
-    public boolean hasAmountMoney(double amount) {
-        return client != null && client.getWallet().hasAmountMoney(amount);
-    }
-
-    @Override
-    public String getFinalStatus() {
-        return client != null
-                ? client.getWallet().getFinalStatus()
-                : "Клиент не инициализирован";
-    }
-
-    // вспомогательные методы
-    private static double readDouble(double min) {
-        while (!scanner.hasNextDouble()) {
-            System.out.print("Введите число >= " + min + ": ");
-            scanner.next();
-        }
-        return Math.max(min, scanner.nextDouble());
-    }
-
-    private static int getIntInput(String prompt, int min, int max) {
-        System.out.print(prompt);
-        while (!scanner.hasNextInt()) {
-            System.out.print("Введите число от " + min + " до " + max + ": ");
-            scanner.next();
-        }
-        int value = scanner.nextInt();
-        scanner.nextLine();
-        return Math.max(min, Math.min(max, value));
-    }
-
-    // проверка статуса клиента через лямбду
     public static boolean checkClientStatus(StatusValidator<ClientStatus> validator) {
         return client != null && validator.validate(client.getClientStatus());
     }
 
-    // фильтрация истории покупок по статусу заказа
     public static void showHistoryByStatus(OrderStatus targetStatus) {
-        if (client == null) {
-            System.out.println("Клиент не инициализирован");
-            return;
-        }
-
-        client.getPurchaseHistory().stream()
-                .filter(record -> record.getOrderStatus() == targetStatus)
-                .forEach(record -> System.out.println("📦 " + record));
+        if (client == null) return;
+        var filtered = client.getPurchaseHistory().stream().filter(r -> r.getOrderStatus() == targetStatus).toList();
+        if (filtered.isEmpty()) System.out.println("Заказов со статусом не найдено.");
+        else filtered.forEach(r -> System.out.println("  " + r));
     }
 
-    // 7.4: Расширенное меню фильтров
     public static void advancedProductFilter() {
         System.out.println("""
-            \nФильтр товаров:
-            1) Только в наличии
-            2) Только со скидкой
-            3) Цена до 5000р
-            4) Название содержит "введите текст"(ПОКА НЕ РАБОТАЕТ)
-            5) Комбинированный: в наличии + до 10000р
-            0) Назад
-            """);
-
-        int choice = getIntInput("Выбор: ", 0, 5);
+        Фильтр товаров:
+        1) Только в наличии
+        2) Только оплаченные (со скидкой)
+        3) Цена до ...
+        4) Название содержит ключевое слово
+        5) Комбинированный: в наличии + до 10000р
+        0) Назад
+        """);
+        int choice = getIntInput("Ваш выбор: ", 0, 5);
         ProductFilter filter = switch (choice) {
-            case 1 -> p -> p.isInStock();
+            case 1 -> Product::isInStock;
             case 2 -> Product::isPaid;
-            case 3 -> p -> p.getPrice() <= 5000;
-            case 4 -> p -> p.getTitle().toLowerCase().contains(" ");
-            case 5 -> ((ProductFilter) Product::isInStock)
-                    .and(p -> p.getPrice() <= 10000);
+            case 3 -> {
+                System.out.print("До: ");
+                double keypay = scanner.nextDouble();
+                yield p -> p.getPrice() <= keypay;
+            }
+            case 4 -> { System.out.print("Введите часть названия: "); String kw = scanner.nextLine().toLowerCase(); yield p -> p.getTitle().toLowerCase().contains(kw); }
+            case 5 -> ((ProductFilter) Product::isInStock).and(p -> p.getPrice() <= 10000);
             default -> p -> true;
         };
-
-        List<Product> filtered = Product.productList.stream()
-                .filter(filter)
-                .toList();
-
-        if (filtered.isEmpty()) {
-            System.out.println("Ничего не найдено");
-        } else {
-            System.out.println("\nНайдено товаров: " + filtered.size());
-            filtered.forEach(p -> System.out.printf("• %s — %.0fр%n",
-                    p.getTitle(), p.getFinalPrice()));
+        var filtered = ShopInventory.getProducts().stream().filter(filter).toList();
+        if (filtered.isEmpty()) System.out.println("Ничего не найдено");
+        else {
+            System.out.println("Найдено товаров: " + filtered.size());
+            filtered.forEach(p -> System.out.printf("- %s - %.0fр%n", p.getTitle(), p.getFinalPrice()));
         }
     }
 
-    // геттеры
-    // получение клиента
+    public static String getFinalStatus() { return client != null ? client.getWallet().getFinalStatus() : "Клиент не создан"; }
     public static Client getClient() { return client; }
-    // инициализация клиента
     public static boolean isInitialized() { return client != null; }
-
-    // сброс (для тестов)
     public static void reset() { client = null; }
+
+    private static double readDouble(double min) {
+        while (!scanner.hasNextDouble()) { System.out.print("Введите число >= " + min + ": "); scanner.next(); }
+        return Math.max(min, scanner.nextDouble());
+    }
+    private static int getIntInput(String prompt, int min, int max) {
+        System.out.print(prompt);
+        while (!scanner.hasNextInt()) { System.out.print("Введите число от " + min + " до " + max + ": "); scanner.next(); }
+        int val = scanner.nextInt(); scanner.nextLine();
+        return Math.max(min, Math.min(max, val));
+    }
 }

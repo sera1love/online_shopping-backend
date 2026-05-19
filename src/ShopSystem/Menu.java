@@ -1,162 +1,135 @@
 package ShopSystem;
-
 import ShopSystem.ClientSystem.Clients;
-import ShopSystem.comporators.*;
-import java.util.*;
+import ShopSystem.comporators.PriceComparator;
+import ShopSystem.comporators.TypeFilterComparator;
+import ShopSystem.interface_OJnS.ClientStatus;
+import ShopSystem.interface_OJnS.StatusValidator;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
 
 public class Menu {
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void start() {
-        // инициализация клиента
         Clients.initClient();
-
         boolean running = true;
         while (running) {
             printMenu();
-            int choice = getIntInput("Выберите действие: ", 1, 8);
-
+            int choice = getIntInput("Выберите действие: ", 1, 11);
             switch (choice) {
-                case 1 -> viewCategories();
-                case 2 -> viewProducts();
+                case 1 -> Catalog.showCategories();
+                case 2 -> ShopInventory.printAll();
                 case 3 -> sortProducts();
                 case 4 -> compareProducts();
                 case 5 -> Clients.purchaseMenu();
                 case 6 -> Clients.showPurchaseHistory();
                 case 7 -> Clients.topUpBalance();
-                case 8 -> {
-                    System.out.println("Выход из программы. Спасибо за покупки!");
-                    running = false;
-                }
+                case 8 -> Clients.advancedProductFilter();
+                case 9 -> checkClientStatusMenu();
+                case 10 -> findExtremes();
+                case 11 -> { System.out.println("Выход из программы."); running = false; }
             }
-            if (running) System.out.println("\n" + "=".repeat(50) + "\n");
+            if (running) System.out.println("=".repeat(50));
         }
     }
 
     private static void printMenu() {
-        // показывает баланс клиента в меню
-        String status = Clients.isInitialized()
-                ? Clients.getClient().getWallet().getFinalStatus()
-                : "Клиент не активен";
+        String status = Clients.isInitialized() ? Clients.getClient().getWallet().getFinalStatus() : "Клиент не активен";
+        System.out.printf("""
+        МАГАЗИН - ГЛАВНОЕ МЕНЮ
+        %s
+        ----------------------------------
+        1) Категории
+        2) Товары
+        3) Сортировка
+        4) Сравнение товаров
+        5) Купить товар
+        6) История покупок
+        7) Пополнить баланс
+        8) Фильтр товаров
+        9) Проверить статус клиента
+        10) Проверить самый дешевый/дорогой
+        11) Выход
+        """, status);
+    }
 
+    private static void checkClientStatusMenu() {
+        if (!Clients.isInitialized()) { System.out.println("Клиент не создан"); return; }
         System.out.println("""
-                \nМАГАЗИН — ГЛАВНОЕ МЕНЮ
-                %s
-                ----------------------------------
-                1) Категории
-                2) Товары
-                3) Сортировка
-                4) Сравнение товаров
-                5) Купить товар
-                6) История покупок
-                7) Пополнить баланс
-                8) Выход
-                """.formatted(status));
+        Проверка статуса:
+        1) Активен или VIP
+        2) Заблокирован
+        3) Любой статус кроме Inactive
+        """);
+        int choice = getIntInput("Выбор: ", 1, 3);
+        var validator = switch (choice) {
+            case 1 -> (ShopSystem.interface_OJnS.StatusValidator<ShopSystem.interface_OJnS.ClientStatus>) s -> s == ShopSystem.interface_OJnS.ClientStatus.ACTIVE || s == ShopSystem.interface_OJnS.ClientStatus.VIP;
+            case 2 -> (ShopSystem.interface_OJnS.StatusValidator<ShopSystem.interface_OJnS.ClientStatus>) s -> s == ShopSystem.interface_OJnS.ClientStatus.BLOCKED;
+            default -> (ShopSystem.interface_OJnS.StatusValidator<ShopSystem.interface_OJnS.ClientStatus>) s -> s != ShopSystem.interface_OJnS.ClientStatus.INACTIVE;
+        };
+        boolean result = Clients.checkClientStatus(validator);
+        System.out.println(result ? "Статус соответствует!" : "Статус не соответствует.");
+    }
+
+    // StreamAPI поиск минимальной и максимальной цены
+    private static void findExtremes() {
+        Product cheapest = ShopInventory.findCheapest();
+        Product mostExpensive = ShopInventory.findMostExpensive();
+        System.out.println("Самый дешевый: " + (cheapest != null ? cheapest.getTitle() + " (" + cheapest.getPrice() + "р)" : "Нет товаров"));
+        System.out.println("Самый дорогой: " + (mostExpensive != null ? mostExpensive.getTitle() + " (" + mostExpensive.getPrice() + "р)" : "Нет товаров"));
+    }
+
+    private static void sortProducts() {
+        List<Product> sorted = ShopInventory.getProducts();
+        if (sorted.isEmpty()) { System.out.println("Нет товаров для сортировки."); return; }
+        System.out.println("""
+        СОРТИРОВКА ТОВАРОВ:
+        1) По цене (возрастание)
+        2) По цене (убывание)
+        3) По названию (А-Я)
+        4) Только электроника
+        5) Только товары для сада
+        """);
+        int sortChoice = getIntInput("Ваш выбор: ", 1, 5);
+        switch (sortChoice) {
+            case 1 -> sorted.sort(Comparator.comparingDouble(Product::getPrice));
+            case 2 -> sorted.sort(Comparator.comparingDouble(Product::getPrice).reversed());
+            case 3 -> sorted.sort(Comparator.comparing(Product::getTitle, String.CASE_INSENSITIVE_ORDER));
+            case 4 -> sorted.removeIf(p -> !(p instanceof Electronic));
+            case 5 -> sorted.removeIf(p -> !(p instanceof GardenItem));
+        }
+        System.out.println("Отсортированный список:");
+        sorted.forEach(Product::showInfo);
+    }
+
+    private static void compareProducts() {
+        List<Product> products = ShopInventory.getProducts();
+        if (products.size() < 2) { System.out.println("Нужно минимум 2 товара для сравнения."); return; }
+        System.out.println("Доступные товары:");
+        for (int i = 0; i < products.size(); i++) {
+            Product p = products.get(i);
+            System.out.printf("%d) %s - %.0fр (%s)%n", i+1, p.getTitle(), p.getPrice(), p.getClass().getSimpleName());
+        }
+        int idx1 = getIntInput("Первый товар (номер): ", 1, products.size()) - 1;
+        int idx2 = getIntInput("Второй товар (номер): ", 1, products.size()) - 1;
+        Product c1 = products.get(idx1);
+        Product c2 = products.get(idx2);
+        System.out.println("Результат сравнения:");
+        System.out.printf("Товар 1: %s | Цена: %.0fр%n", c1.getTitle(), c1.getPrice());
+        System.out.printf("Товар 2: %s | Цена: %.0fр%n", c2.getTitle(), c2.getPrice());
+        if (c1.getPrice() != c2.getPrice()) {
+            double diff = Math.abs(c1.getPrice() - c2.getPrice());
+            String cheaper = c1.getPrice() < c2.getPrice() ? c1.getTitle() : c2.getTitle();
+            System.out.printf("Разница: %.0fр | Выгоднее: %s%n", diff, cheaper);
+        }
     }
 
     private static int getIntInput(String prompt, int min, int max) {
         System.out.print(prompt);
-        while (!scanner.hasNextInt()) {
-            System.out.print("Введите число от " + min + " до " + max + ": ");
-            scanner.next();
-        }
-        int value = scanner.nextInt();
-        scanner.nextLine();
-        return Math.max(min, Math.min(max, value));
-    }
-
-    private static void viewCategories() {
-        System.out.println("\nКатегории:");
-        Catalog.showCategories();
-    }
-
-    private static void viewProducts() {
-        System.out.println("\nТовары:");
-        if (Product.productList.isEmpty()) {
-            System.out.println("Список товаров пуст.");
-            return;
-        }
-        Product.getProductList();
-    }
-
-    private static void sortProducts() {
-        if (Product.productList.isEmpty()) {
-            System.out.println("Нет товаров для сортировки.");
-            return;
-        }
-
-        System.out.println("""
-                СОРТИРОВКА ТОВАРОВ:
-                1) По цене (возрастание)
-                2) По цене (убывание)
-                3) По названию (А-Я)
-                4) Только электроника
-                5) Только товары для сада
-                """);
-
-        int sortChoice = getIntInput("Ваш выбор: ", 1, 5);
-        List<Category> sorted = new ArrayList<>(Product.productList);
-
-        switch (sortChoice) {
-            case 1 -> sorted.sort(new PriceComparator(true));
-            case 2 -> sorted.sort(new PriceComparator(false));
-            case 3 -> sorted.sort(Comparator.comparing(Category::getTitle, String.CASE_INSENSITIVE_ORDER));
-            case 4 -> sorted = TypeFilterComparator.filterByType(Product.productList, Electronic.class, true);
-            case 5 -> sorted = TypeFilterComparator.filterByType(Product.productList, GardenItem.class, true);
-        }
-
-        System.out.println("\nОтсортированный список:");
-        for (Category c : sorted) c.showInfo();
-    }
-
-    private static void compareProducts() {
-        if (Product.productList.size() < 2) {
-            System.out.println("Нужно минимум 2 товара для сравнения.");
-            return;
-        }
-
-        System.out.println("\nДоступные товары:");
-        for (int i = 0; i < Product.productList.size(); i++) {
-            Category c = Product.productList.get(i);
-            System.out.printf("%d) %s — %.0fр (%s)%n",
-                    i+1, c.getTitle(), c.getPrice(), c.getClass().getSimpleName());
-        }
-
-        int idx1 = getIntInput("Первый товар (номер): ", 1, Product.productList.size()) - 1;
-        int idx2 = getIntInput("Второй товар (номер): ", 1, Product.productList.size()) - 1;
-
-        Category c1 = Product.productList.get(idx1);
-        Category c2 = Product.productList.get(idx2);
-
-        if (!canBeCompared(c1, c2)) {
-            System.out.println("ОШИБКА: Нельзя сравнить товары разных категорий!");
-            System.out.println("   \"" + c1.getTitle() + "\" (" + c1.getClass().getSimpleName() + ")");
-            System.out.println("   vs");
-            System.out.println("   \"" + c2.getTitle() + "\" (" + c2.getClass().getSimpleName() + ")");
-            System.out.println("Совет: Сравнивайте товары одной категории!");
-            return;
-        }
-
-        System.out.println("\nРезультат сравнения:");
-        System.out.printf("Товар 1: %s%n", c1.getTitle());
-        System.out.printf("  Цена: %.0fр | ID: %d%n", c1.getPrice(), c1.getID());
-        System.out.printf("Товар 2: %s%n", c2.getTitle());
-        System.out.printf("  Цена: %.0fр | ID: %d%n", c2.getPrice(), c2.getID());
-        System.out.printf("Равны? %s%n", c1.equals(c2));
-
-        if (c1.getPrice() != c2.getPrice()) {
-            double diff = Math.abs(c1.getPrice() - c2.getPrice());
-            String cheaper = c1.getPrice() < c2.getPrice() ? c1.getTitle() : c2.getTitle();
-            System.out.printf("Разница в цене: %.0fр | Выгоднее: %s%n", diff, cheaper);
-        }
-    }
-
-    // сравнивать можно только совместимые типы (этап 6.4)
-    private static boolean canBeCompared(Category c1, Category c2) {
-        if (c1.getClass() == c2.getClass()) return true;
-        if (c1 instanceof Electronic && c2 instanceof Electronic) return true;
-        if (c1 instanceof GardenItem && c2 instanceof GardenItem) return true;
-        if (!c1.isSubCategory() && !c2.isSubCategory()) return true;
-        return false;
+        while (!scanner.hasNextInt()) { System.out.print("Введите число от " + min + " до " + max + ": "); scanner.next(); }
+        int val = scanner.nextInt(); scanner.nextLine();
+        return Math.max(min, Math.min(max, val));
     }
 }
