@@ -19,7 +19,7 @@ public class Menu {
             printMenu();
             int choice = getIntInput("Выберите действие: ", 1, 11);
             switch (choice) {
-                case 1 -> Catalog.showCategories();
+                case 1 -> Catalog.getInstance().showCategories();
                 case 2 -> ShopInventory.printAll();
                 case 3 -> sortProducts();
                 case 4 -> compareProducts();

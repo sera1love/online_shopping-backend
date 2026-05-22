@@ -1,9 +1,11 @@
 package ShopSystem.ClientSystem;
+
 import ShopSystem.Product;
 import ShopSystem.interface_OJnS.ClientStatus;
 import ShopSystem.interface_OJnS.OrderStatus.OrderStatus;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Client extends Person {
     private final Wallet wallet;
@@ -20,33 +22,66 @@ public class Client extends Person {
     public void setClientStatus(ClientStatus status) { this.clientStatus = status; }
     public List<PurchaseRecord> getPurchaseHistory() { return new ArrayList<>(purchaseHistory); }
 
-    public boolean buyProduct(Product product) {
+    // <-- ИЗМЕНЕН: метод теперь принимает количество
+    public boolean buyProduct(Product product, int quantity) {
         if (clientStatus == ClientStatus.BLOCKED) {
-            System.out.println("Клиент заблокирован! Покупка невозможна."); return false;
+            System.out.println("Клиент заблокирован! Покупка невозможна.");
+            return false;
         }
         if (!product.isInStock()) {
-            System.out.println("Товар закончился!"); return false;
+            System.out.println("Товар закончился!");
+            return false;
         }
-        if (product.isPaid()) {
-            System.out.println("Товар уже оплачен или зарезервирован!"); return false;
+        if (product.getQuantity() < quantity) {
+            System.out.println("Недостаточно товара! Доступно: " + product.getQuantity() + " шт.");
+            return false;
         }
-        double finalPrice = product.getFinalPrice();
-        if (wallet.withdraw(finalPrice)) {
-            product.pay(finalPrice);
-            product.setInStock(false);
-            purchaseHistory.add(new PurchaseRecord(product, finalPrice, OrderStatus.NEW));
-            System.out.println("Покупка успешна! Списание: " + finalPrice + "р");
+
+        double totalPrice = product.getFinalPrice() * quantity;
+
+        if (wallet.withdraw(totalPrice)) {
+            product.pay(totalPrice, quantity);
+            purchaseHistory.add(new PurchaseRecord(product, totalPrice, quantity, OrderStatus.NEW));
+            System.out.printf("Покупка успешна! Куплено: %d шт. | Списание: %.2fр%n",
+                    quantity, totalPrice);
             return true;
         } else {
-            System.out.println("Недостаточно средств!"); return false;
+            System.out.println("Недостаточно средств!");
+            return false;
         }
     }
 
+    // Для совместимости
+    public boolean buyProduct(Product product) {
+        return buyProduct(product, 1);
+    }
+
     public void topUp(double amount) {
-        if (clientStatus == ClientStatus.BLOCKED) { System.out.println("Пополнение недоступно"); return; }
+        if (clientStatus == ClientStatus.BLOCKED) {
+            System.out.println("Пополнение недоступно");
+            return;
+        }
         wallet.deposit(amount);
     }
-    @Override public String toString() {
-        return super.toString() + " | " + wallet.getFinalStatus() + " | Статус: " + clientStatus.getLabel();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Client)) return false;
+        if (!super.equals(o)) return false;
+        Client client = (Client) o;
+        return Objects.equals(wallet, client.wallet) &&
+                clientStatus == client.clientStatus;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), wallet, clientStatus);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " | " + wallet.getFinalStatus() +
+                " | Статус: " + clientStatus.getLabel();
     }
 }
