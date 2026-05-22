@@ -11,13 +11,12 @@ public abstract class Product implements Payable {
     private double price;
     private final String description;
     private PaymentStatus paymentStatus = PaymentStatus.NEW;
-    private int quantity; // <-- ДОБАВЛЕНО: количество на складе
+    private int quantity;
 
     public Product(String title, double price, String description) {
         this(title, price, description, 1); // по умолчанию 1 штука
     }
 
-    // <-- ДОБАВЛЕН: конструктор с количеством
     public Product(String title, double price, String description, int quantity) {
         this.id = idCounter++;
         this.title = title;
@@ -31,7 +30,6 @@ public abstract class Product implements Payable {
         return price * (paymentStatus == PaymentStatus.PAID ? 0.95 : 1.0);
     }
 
-    // <-- ИЗМЕНЕН: метод pay теперь принимает количество
     public void pay(double amount, int qty) {
         if (quantity < qty) {
             System.out.println("Недостаточно товара на складе! Доступно: " + quantity);
@@ -60,7 +58,6 @@ public abstract class Product implements Payable {
         return quantity == 0; // товар "оплачен" если закончился
     }
 
-    // <-- ДОБАВЛЕНЫ: методы для работы с количеством
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = Math.max(0, quantity); }
     public void addQuantity(int amount) { this.quantity += Math.max(0, amount); }
@@ -69,7 +66,7 @@ public abstract class Product implements Payable {
         if (!inStock) this.quantity = 0;
     }
 
-    // Getters и Setters
+    // геттеры и сеттеры
     public int getId() { return id; }
     public String getTitle() { return title; }
     public double getPrice() { return price; }

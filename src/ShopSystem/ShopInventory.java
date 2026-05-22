@@ -19,7 +19,6 @@ public class ShopInventory {
         return new ArrayList<>(products);
     }
 
-    // <-- ДОБАВЛЕН: метод генерации рандомных товаров
     public static void generateRandomProducts(int minCount, int maxCount) {
         int count = random.nextInt(maxCount - minCount + 1) + minCount;
 

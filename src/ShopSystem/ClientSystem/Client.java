@@ -22,7 +22,6 @@ public class Client extends Person {
     public void setClientStatus(ClientStatus status) { this.clientStatus = status; }
     public List<PurchaseRecord> getPurchaseHistory() { return new ArrayList<>(purchaseHistory); }
 
-    // <-- ИЗМЕНЕН: метод теперь принимает количество
     public boolean buyProduct(Product product, int quantity) {
         if (clientStatus == ClientStatus.BLOCKED) {
             System.out.println("Клиент заблокирован! Покупка невозможна.");
@@ -51,7 +50,7 @@ public class Client extends Person {
         }
     }
 
-    // Для совместимости
+    // для совместимости
     public boolean buyProduct(Product product) {
         return buyProduct(product, 1);
     }

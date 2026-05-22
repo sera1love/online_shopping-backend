@@ -13,7 +13,7 @@ public class Main {
         ShopInventory.addProduct(ProductFactory.createProduct("garden", "Лопата Универсал", 1500, "Для дома, дачи и кладбища"));
         ShopInventory.getProducts().get(ShopInventory.getProducts().size() - 1).setQuantity(20);
 
-        // Категории через Singleton
+        // категории через Singleton
         catalog.addCategory(new Category("Электроника", 0, "Электро-товары") {
             @Override
             public void showInfo() {

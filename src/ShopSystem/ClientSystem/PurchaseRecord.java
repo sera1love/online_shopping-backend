@@ -9,7 +9,7 @@ import java.util.Objects;
 public final class PurchaseRecord {
     private final Product product;
     private final double amount;
-    private final int quantity; // <-- ДОБАВЛЕНО
+    private final int quantity;
     private final LocalDateTime purchaseDate;
     private final OrderStatus orderStatus;
     private final String transactionId;

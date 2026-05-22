@@ -1,7 +1,6 @@
 package ShopSystem;
 import java.util.Objects;
 
-// независимый класс категории (убрана связь с Product)
 public abstract class Category implements Comparable<Category> {
     private static int idgen = 1;
     private final int id;
