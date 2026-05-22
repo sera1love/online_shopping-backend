@@ -1,9 +1,6 @@
 package ShopSystem.Pattern.Factories;
 
-import ShopSystem.Electronic;
-import ShopSystem.GardenItem;
-import ShopSystem.MobileDevice;
-import ShopSystem.Product;
+import ShopSystem.*;
 
 public class ProductFactory {
     public static Product createProduct(String type, String title, double price, String description) {

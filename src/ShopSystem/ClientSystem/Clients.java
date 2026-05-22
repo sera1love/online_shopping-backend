@@ -1,5 +1,6 @@
 package ShopSystem.ClientSystem;
 
+import ShopSystem.Pattern.Factories.ProductFactory;
 import ShopSystem.Product;
 import ShopSystem.ShopInventory;
 import ShopSystem.Pattern.Factories.ClientFactory;
@@ -13,7 +14,7 @@ import ShopSystem.Pattern.Strategy.WalletPayment;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Predicate;
-
+// D - Dependency Inversion, зависит от абстракции, а не от конкретики
 public class Clients {
     private static Client client = null;
     private static final Scanner scanner = new Scanner(System.in);
@@ -60,6 +61,14 @@ public class Clients {
     }
 
     public static void showProductsForSale() {
+        ShopInventory.generateRandomProducts(15, 30);
+        ShopInventory.addProduct(ProductFactory.createProduct("mobile", "Xiaomi Galaxy S200 Ultra", 190000, "Смартфон с процессором Snapdragon SQ+ 656GHz"));
+        ShopInventory.getProducts().get(ShopInventory.getProducts().size() - 1).setQuantity(5);
+        ShopInventory.addProduct(ProductFactory.createProduct("mobile", "iPhone 666 Pro Google Ultra Max", 580000, "Смартфон от Samsung Wall S600"));
+        ShopInventory.getProducts().get(ShopInventory.getProducts().size() - 1).setQuantity(3);
+        ShopInventory.addProduct(ProductFactory.createProduct("garden", "Лопата Универсал", 1500, "Для дома, дачи и кладбища"));
+        ShopInventory.getProducts().get(ShopInventory.getProducts().size() - 1).setQuantity(20);
+
         List<Product> products = ShopInventory.getProducts();
         if (products.isEmpty()) {
             System.out.println("Товаров нет в наличии");

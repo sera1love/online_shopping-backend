@@ -14,6 +14,7 @@ public abstract class Category implements Comparable<Category> {
         this.description = description;
     }
 
+
     public abstract void showInfo();
     public boolean isSubCategory() { return false; }
 

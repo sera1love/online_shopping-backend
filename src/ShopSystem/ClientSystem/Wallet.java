@@ -2,7 +2,7 @@ package ShopSystem.ClientSystem;
 
 import ShopSystem.interface_OJnS.Finansable;
 import java.util.Objects;
-
+// S - Single Responsibility, класс который делает только одну задачу и не знает о других
 public class Wallet implements Finansable {
     private double balance;
     private final String currency = "р";

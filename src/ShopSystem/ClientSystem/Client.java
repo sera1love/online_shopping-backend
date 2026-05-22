@@ -51,6 +51,7 @@ public class Client extends Person {
     }
 
     // для совместимости
+    // L - Liskov Substitution, наследник работает везде, где работает родитель
     public boolean buyProduct(Product product) {
         return buyProduct(product, 1);
     }

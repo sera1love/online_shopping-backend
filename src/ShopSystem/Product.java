@@ -1,5 +1,6 @@
 package ShopSystem;
 
+import ShopSystem.Pattern.Factories.ProductFactory;
 import ShopSystem.interface_OJnS.Payable;
 import ShopSystem.interface_OJnS.OrderStatus.PaymentStatus;
 import java.util.Objects;
