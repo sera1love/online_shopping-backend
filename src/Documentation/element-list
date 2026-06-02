@@ -1,5 +1,8 @@
-unnamed package
 ShopSystem
 ShopSystem.ClientSystem
 ShopSystem.comporators
+ShopSystem.Exception
 ShopSystem.interface_OJnS
+ShopSystem.interface_OJnS.OrderStatus
+ShopSystem.Pattern.Factories
+ShopSystem.Pattern.Strategy
