@@ -1,6 +1,7 @@
 package ShopSystem.ClientSystem;
 
 import ShopSystem.Product;
+import ShopSystem.Exception.*;
 import ShopSystem.interface_OJnS.ClientStatus;
 import ShopSystem.interface_OJnS.OrderStatus.OrderStatus;
 import java.util.ArrayList;
@@ -17,51 +18,79 @@ public class Client extends Person {
         this.wallet = new Wallet(initialBalance);
     }
 
-    public Wallet getWallet() { return wallet; }
-    public ClientStatus getClientStatus() { return clientStatus; }
-    public void setClientStatus(ClientStatus status) { this.clientStatus = status; }
-    public List<PurchaseRecord> getPurchaseHistory() { return new ArrayList<>(purchaseHistory); }
+    public Wallet getWallet() {
+        return wallet;
+    }
+
+    public ClientStatus getClientStatus() {
+        return clientStatus;
+    }
+
+    public void setClientStatus(ClientStatus status) {
+        this.clientStatus = status;
+    }
+
+    public List<PurchaseRecord> getPurchaseHistory() {
+        return new ArrayList<>(purchaseHistory);
+    }
 
     public boolean buyProduct(Product product, int quantity) {
-        if (clientStatus == ClientStatus.BLOCKED) {
-            System.out.println("Клиент заблокирован! Покупка невозможна.");
-            return false;
-        }
-        if (!product.isInStock()) {
-            System.out.println("Товар закончился!");
-            return false;
-        }
-        if (product.getQuantity() < quantity) {
-            System.out.println("Недостаточно товара! Доступно: " + product.getQuantity() + " шт.");
-            return false;
-        }
+        try {
+            if (clientStatus == ClientStatus.BLOCKED) {
+                throw new ClientBlockedException(getName());
+            }
 
-        double totalPrice = product.getFinalPrice() * quantity;
+            if (product == null) {
+                throw new ProductNotFoundException("null");
+            }
 
-        if (wallet.withdraw(totalPrice)) {
-            product.pay(totalPrice, quantity);
-            purchaseHistory.add(new PurchaseRecord(product, totalPrice, quantity, OrderStatus.NEW));
-            System.out.printf("Покупка успешна! Куплено: %d шт. | Списание: %.2fр%n",
-                    quantity, totalPrice);
-            return true;
-        } else {
-            System.out.println("Недостаточно средств!");
+            if (quantity <= 0) {
+                throw new InvalidQuantityException(quantity);
+            }
+
+            if (!product.isInStock()) {
+                throw new ProductOutOfStockException(0, quantity);
+            }
+
+            if (product.getQuantity() < quantity) {
+                throw new ProductOutOfStockException(product.getQuantity(), quantity);
+            }
+
+            double totalPrice = product.getFinalPrice() * quantity;
+
+            if (wallet.withdraw(totalPrice)) {
+                product.pay(totalPrice, quantity);
+                purchaseHistory.add(new PurchaseRecord(product, totalPrice, quantity, OrderStatus.NEW));
+                System.out.printf("Покупка успешна! Куплено: %d шт. | Списание: %.2fр%n",
+                        quantity, totalPrice);
+                return true;
+            }
+            return false;
+
+        } catch (ClientBlockedException | ProductNotFoundException |
+                 ProductOutOfStockException | InvalidQuantityException e) {
+            System.out.println("Ошибка покупки: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.out.println("Критическая ошибка при покупке: " + e.getMessage());
             return false;
         }
     }
 
-    // для совместимости
-    // L - Liskov Substitution, наследник работает везде, где работает родитель
     public boolean buyProduct(Product product) {
         return buyProduct(product, 1);
     }
 
     public void topUp(double amount) {
-        if (clientStatus == ClientStatus.BLOCKED) {
-            System.out.println("Пополнение недоступно");
-            return;
+        try {
+            if (clientStatus == ClientStatus.BLOCKED) {
+                throw new ClientBlockedException(getName());
+            }
+            wallet.deposit(amount);
+            System.out.printf("Баланс пополнен на %.2fр%n", amount);
+        } catch (ClientBlockedException | InvalidAmountException e) {
+            System.out.println("Ошибка пополнения: " + e.getMessage());
         }
-        wallet.deposit(amount);
     }
 
     @Override

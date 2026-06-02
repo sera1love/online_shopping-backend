@@ -1,7 +1,6 @@
 package ShopSystem;
+
 import ShopSystem.ClientSystem.Clients;
-import ShopSystem.comporators.PriceComparator;
-import ShopSystem.comporators.TypeFilterComparator;
 import ShopSystem.interface_OJnS.ClientStatus;
 import ShopSystem.interface_OJnS.StatusValidator;
 
@@ -13,11 +12,14 @@ public class Menu {
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void start() {
-        Clients.initClient();
+        if (!Clients.isInitialized()) {
+            Clients.initClient();
+        }
+
         boolean running = true;
         while (running) {
             printMenu();
-            int choice = getIntInput("Выберите действие: ", 1, 11);
+            int choice = getIntInput("Выберите действие: ", 1, 12);
             switch (choice) {
                 case 1 -> Catalog.getInstance().showCategories();
                 case 2 -> ShopInventory.printAll();
@@ -29,30 +31,61 @@ public class Menu {
                 case 8 -> Clients.advancedProductFilter();
                 case 9 -> checkClientStatusMenu();
                 case 10 -> findExtremes();
-                case 11 -> { System.out.println("Выход из программы."); running = false; }
+                case 11 -> manageClientsMenu(); // Вход в подменю
+                case 12 -> {
+                    System.out.println("Выход из программы.");
+                    running = false;
+                }
             }
             if (running) System.out.println("=".repeat(50));
         }
     }
 
     private static void printMenu() {
-        String status = Clients.isInitialized() ? Clients.getClient().getWallet().getFinalStatus() : "Клиент не активен";
+        String status = Clients.isInitialized()
+                ? Clients.getClient().getWallet().getFinalStatus()
+                : "Клиент не выбран";
         System.out.printf("""
         МАГАЗИН - ГЛАВНОЕ МЕНЮ
         %s
         ----------------------------------
-        1) Категории
-        2) Товары
-        3) Сортировка
-        4) Сравнение товаров
-        5) Купить товар
-        6) История покупок
-        7) Пополнить баланс
-        8) Фильтр товаров
-        9) Проверить статус клиента
+        1)  Категории
+        2)  Товары
+        3)  Сортировка
+        4)  Сравнение товаров
+        5)  Купить товар
+        6)  История покупок
+        7)  Пополнить баланс
+        8)  Фильтр товаров
+        9)  Проверить статус клиента
         10) Проверить самый дешевый/дорогой
-        11) Выход
+        11) Управление клиентами
+        12) Выход
         """, status);
+    }
+
+    private static void manageClientsMenu() {
+        boolean inSubmenu = true;
+        while (inSubmenu) {
+            System.out.println("\n=== УПРАВЛЕНИЕ КЛИЕНТАМИ ===");
+            System.out.println("1) Показать список клиентов");
+            System.out.println("2) Выбрать активного клиента");
+            System.out.println("3) Создать нового клиента");
+            System.out.println("4) Заблокировать / Разблокировать");
+            System.out.println("5) Удалить клиента из базы");
+            System.out.println("0) Назад в главное меню");
+
+            int choice = getIntInput("Ваш выбор: ", 0, 5);
+
+            switch (choice) {
+                case 1 -> Clients.showAllClients();
+                case 2 -> Clients.selectClient();
+                case 3 -> Clients.initClient();
+                case 4 -> Clients.toggleClientBlock();
+                case 5 -> Clients.deleteClient();
+                case 0 -> inSubmenu = false;
+            }
+        }
     }
 
     private static void checkClientStatusMenu() {
@@ -128,8 +161,12 @@ public class Menu {
 
     private static int getIntInput(String prompt, int min, int max) {
         System.out.print(prompt);
-        while (!scanner.hasNextInt()) { System.out.print("Введите число от " + min + " до " + max + ": "); scanner.next(); }
-        int val = scanner.nextInt(); scanner.nextLine();
+        while (!scanner.hasNextInt()) {
+            System.out.print("Введите число от " + min + " до " + max + ": ");
+            scanner.next();
+        }
+        int val = scanner.nextInt();
+        scanner.nextLine();
         return Math.max(min, Math.min(max, val));
     }
 }

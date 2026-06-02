@@ -1,6 +1,7 @@
 package ShopSystem;
 
-import ShopSystem.Pattern.Factories.ProductFactory;
+import ShopSystem.Exception.InvalidQuantityException;
+import ShopSystem.Exception.ProductOutOfStockException;
 import ShopSystem.interface_OJnS.Payable;
 import ShopSystem.interface_OJnS.OrderStatus.PaymentStatus;
 import java.util.Objects;
@@ -15,7 +16,7 @@ public abstract class Product implements Payable {
     private int quantity;
 
     public Product(String title, double price, String description) {
-        this(title, price, description, 1); // по умолчанию 1 штука
+        this(title, price, description, 1);
     }
 
     public Product(String title, double price, String description, int quantity) {
@@ -23,7 +24,7 @@ public abstract class Product implements Payable {
         this.title = title;
         this.price = price;
         this.description = description;
-        this.quantity = Math.max(0, quantity);
+        setQuantity(quantity);
     }
 
     @Override
@@ -32,49 +33,87 @@ public abstract class Product implements Payable {
     }
 
     public void pay(double amount, int qty) {
-        if (quantity < qty) {
-            System.out.println("Недостаточно товара на складе! Доступно: " + quantity);
-            paymentStatus = PaymentStatus.FAILED;
-            return;
-        }
-        if (amount >= price * qty) {
-            quantity -= qty;
-            if (quantity == 0) {
-                paymentStatus = PaymentStatus.PAID;
+        try {
+            if (qty <= 0) {
+                throw new InvalidQuantityException(qty);
             }
-            System.out.println("Оплата прошла успешно! Куплено: " + qty + " шт.");
-        } else {
-            paymentStatus = PaymentStatus.FAILED;
-            System.out.println("Недостаточно средств!");
+            if (quantity < qty) {
+                paymentStatus = PaymentStatus.FAILED;
+                throw new ProductOutOfStockException(quantity, qty);
+            }
+            if (amount >= price * qty) {
+                quantity -= qty;
+                if (quantity == 0) {
+                    paymentStatus = PaymentStatus.PAID;
+                }
+                System.out.println("Оплата прошла успешно! Куплено: " + qty + " шт.");
+            } else {
+                paymentStatus = PaymentStatus.FAILED;
+                System.out.println("Недостаточно средств для оплаты товара!");
+            }
+        } catch (InvalidQuantityException | ProductOutOfStockException e) {
+            System.out.println("Ошибка оплаты: " + e.getMessage());
+            throw e;
         }
     }
 
     @Override
     public void pay(double amount) {
-        pay(amount, 1); // для совместимости
+        pay(amount, 1);
     }
 
     @Override
     public boolean isPaid() {
-        return quantity == 0; // товар "оплачен" если закончился
+        return quantity == 0;
     }
 
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = Math.max(0, quantity); }
-    public void addQuantity(int amount) { this.quantity += Math.max(0, amount); }
-    public boolean isInStock() { return quantity > 0; }
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = Math.max(0, quantity);
+    }
+
+    public void addQuantity(int amount) {
+        this.quantity += Math.max(0, amount);
+    }
+
+    public boolean isInStock() {
+        return quantity > 0;
+    }
+
     public void setInStock(boolean inStock) {
         if (!inStock) this.quantity = 0;
     }
 
-    // геттеры и сеттеры
-    public int getId() { return id; }
-    public String getTitle() { return title; }
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
-    public String getDescription() { return description; }
-    public PaymentStatus getPaymentStatus() { return paymentStatus; }
-    public void setPaymentStatus(PaymentStatus status) { this.paymentStatus = status; }
+    public int getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus status) {
+        this.paymentStatus = status;
+    }
 
     public abstract boolean isSubCategory();
     public abstract void showInfo();

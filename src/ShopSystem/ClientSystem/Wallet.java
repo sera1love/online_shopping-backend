@@ -1,22 +1,31 @@
 package ShopSystem.ClientSystem;
 
+import ShopSystem.Exception.*;
 import ShopSystem.interface_OJnS.Finansable;
 import java.util.Objects;
-// S - Single Responsibility, класс который делает только одну задачу и не знает о других
+
 public class Wallet implements Finansable {
     private double balance;
     private final String currency = "р";
 
     public Wallet(double initialBalance) {
-        this.balance = Math.max(0, initialBalance);
+        if (initialBalance < 0) {
+            throw new InvalidAmountException(initialBalance);
+        }
+        this.balance = initialBalance;
     }
 
     @Override
-    public double checkBalance() { return balance; }
+    public double checkBalance() {
+        return balance;
+    }
 
     @Override
     public boolean hasAmountMoney(double amount) {
-        return balance >= amount && amount > 0;
+        if (amount <= 0) {
+            throw new InvalidAmountException(amount);
+        }
+        return balance >= amount;
     }
 
     @Override
@@ -25,25 +34,48 @@ public class Wallet implements Finansable {
     }
 
     public boolean deposit(double amount) {
-        if (amount > 0) {
+        boolean success = false;
+        try {
+            if (amount <= 0) {
+                throw new InvalidAmountException(amount);
+            }
             balance += amount;
+            success = true;
             return true;
+        } catch (InvalidAmountException e) {
+            System.out.println("Ошибка пополнения: " + e.getMessage());
+            return false;
+        } finally {
+            // finally выполняется всегда. Здесь удобно писать в лог/консоль факт операции
+            System.out.println("[ЛОГ Wallet] Попытка пополнения на " + amount + "р. Успех: " + success);
         }
-        System.out.println("Сумма должна быть положительной");
-        return false;
     }
 
     public boolean withdraw(double amount) {
-        if (amount <= 0) return false;
-        if (hasAmountMoney(amount)) {
+        boolean success = false;
+        try {
+            if (amount <= 0) {
+                throw new InvalidAmountException(amount);
+            }
+            if (!hasAmountMoney(amount)) {
+                throw new InsufficientFundsException(balance, amount);
+            }
             balance -= amount;
+            success = true;
             return true;
+        } catch (ShopSystemException e) {
+            System.out.println("Ошибка списания: " + e.getMessage());
+            return false;
+        } finally {
+            System.out.println("[ЛОГ Wallet] Попытка списания " + amount + "р. Успех: " + success);
         }
-        return false;
     }
 
     public void setBalance(double balance) {
-        if (balance >= 0) this.balance = balance;
+        if (balance < 0) {
+            throw new InvalidAmountException(balance);
+        }
+        this.balance = balance;
     }
 
     @Override

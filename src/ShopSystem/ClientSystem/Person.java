@@ -9,6 +9,13 @@ public class Person {
     private String phone;
 
     public Person(String name, String phone) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Имя не может быть пустым!");
+        }
+        if (phone == null || phone.trim().isEmpty()) {
+            throw new IllegalArgumentException("Телефон не может быть пустым!");
+        }
+
         this.id = idGen++;
         this.name = name;
         this.phone = phone;
@@ -16,9 +23,15 @@ public class Person {
 
     public int getId() { return id; }
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {
+        if (name == null || name.trim().isEmpty()) throw new IllegalArgumentException("Имя пустое");
+        this.name = name;
+    }
     public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public void setPhone(String phone) {
+        if (phone == null || phone.trim().isEmpty()) throw new IllegalArgumentException("Телефон пустой");
+        this.phone = phone;
+    }
 
     @Override
     public boolean equals(Object o) {

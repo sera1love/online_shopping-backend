@@ -1,6 +1,7 @@
 package ShopSystem;
 
 import ShopSystem.Pattern.Factories.ProductFactory;
+import ShopSystem.Exception.InvalidProductTypeException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -12,6 +13,9 @@ public class ShopInventory {
     private static final Random random = new Random();
 
     public static void addProduct(Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException("Нельзя добавить null в инвентарь!");
+        }
         products.add(product);
     }
 
@@ -20,55 +24,59 @@ public class ShopInventory {
     }
 
     public static void generateRandomProducts(int minCount, int maxCount) {
-        int count = random.nextInt(maxCount - minCount + 1) + minCount;
+        try {
+            int count = random.nextInt(maxCount - minCount + 1) + minCount;
 
-        String[] mobileNames = {
-                "Xiaomi Galaxy S200 Ultra", "iPhone 666 Pro Max", "HONOR X8 4G",
-                "Samsung Galaxy Z Fold 99", "POCO MEGA ULTRA", "OnePlus 50 Pro"
-        };
-
-        String[] electronicNames = {
-                "Настольная лампа LEOMAX", "Ноутбук Microslop Digma Pro",
-                "Монитор 56' Глядило'", "Клавиатура Магний", "Мышь Bluuno G8",
-                "Наушники Sonya P354", "Чайник Варила'", "Системный блок Relotech"
-        };
-
-        String[] gardenNames = {
-                "Лопата Универсал", "Грабли LEOMAX", "Шланг Малина 25м",
-                "Удобрение Дачный домик'", "Секатор Надежда'", "Топор-Колун Витязь'",
-                "Биотуалет Дружина'"
-        };
-
-        System.out.println("Генерируем " + count + " случайных товаров...");
-
-        for (int i = 0; i < count; i++) {
-            int type = random.nextInt(3); // 0-mobile, 1-electronic, 2-garden
-            int quantity = random.nextInt(10) + 1; // от 1 до 10 штук
-            double price = (random.nextInt(500) + 1) * 100; // от 100 до 50000
-
-            Product product = switch (type) {
-                case 0 -> ProductFactory.createProduct("mobile",
-                        mobileNames[random.nextInt(mobileNames.length)],
-                        price,
-                        "Смартфон с процессором Snapdragon SQ+ " + random.nextInt(1000) + "GHz");
-                case 1 -> ProductFactory.createProduct("electronic",
-                        electronicNames[random.nextInt(electronicNames.length)],
-                        price,
-                        "Электроника для дома и офиса");
-                case 2 -> ProductFactory.createProduct("garden",
-                        gardenNames[random.nextInt(gardenNames.length)],
-                        price,
-                        "Товар для дачи и сада");
-                default -> null;
+            String[] mobileNames = {
+                    "Xiaomi Galaxy S200 Ultra", "iPhone 666 Pro Max", "HONOR X8 4G",
+                    "Samsung Galaxy Z Fold 99", "POCO MEGA ULTRA", "OnePlus 50 Pro"
             };
 
-            if (product != null) {
-                product.setQuantity(quantity);
-                products.add(product);
-            }
-        }
+            String[] electronicNames = {
+                    "Настольная лампа LEOMAX", "Ноутбук Microslop Digma Pro",
+                    "Монитор 56' Глядило'", "Клавиатура Магний", "Мышь Bluuno G8",
+                    "Наушники Sonya P354", "Чайник Варила'", "Системный блок Relotech"
+            };
 
-        System.out.println("Сгенерировано товаров: " + count);
+            String[] gardenNames = {
+                    "Лопата Универсал", "Грабли LEOMAX", "Шланг Малина 25м",
+                    "Удобрение Дачный домик'", "Секатор Надежда'", "Топор-Колун Витязь'",
+                    "Биотуалет Дружина'"
+            };
+
+            System.out.println("Генерируем " + count + " случайных товаров...");
+
+            for (int i = 0; i < count; i++) {
+                int type = random.nextInt(3);
+                int quantity = random.nextInt(10) + 1;
+                double price = (random.nextInt(500) + 1) * 100;
+
+                Product product = switch (type) {
+                    case 0 -> ProductFactory.createProduct("mobile",
+                            mobileNames[random.nextInt(mobileNames.length)],
+                            price,
+                            "Смартфон с процессором Snapdragon SQ+ " + random.nextInt(1000) + "GHz");
+                    case 1 -> ProductFactory.createProduct("electronic",
+                            electronicNames[random.nextInt(electronicNames.length)],
+                            price,
+                            "Электроника для дома и офиса");
+                    case 2 -> ProductFactory.createProduct("garden",
+                            gardenNames[random.nextInt(gardenNames.length)],
+                            price,
+                            "Товар для дачи и сада");
+                    default -> null;
+                };
+
+                if (product != null) {
+                    product.setQuantity(quantity);
+                    products.add(product);
+                }
+            }
+
+            System.out.println("Сгенерировано товаров: " + count);
+        } catch (Exception e) {
+            System.out.println("Ошибка генерации товаров: " + e.getMessage());
+        }
     }
 
     // StreamAPI фильтрация

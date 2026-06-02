@@ -2,6 +2,7 @@ package ShopSystem.Pattern.Strategy;
 
 import ShopSystem.Product;
 import ShopSystem.ClientSystem.Wallet;
+import ShopSystem.Exception.InsufficientFundsException;
 
 public class WalletPayment implements PaymentStrategy {
     private final Wallet wallet;
@@ -12,14 +13,19 @@ public class WalletPayment implements PaymentStrategy {
 
     @Override
     public boolean processPayment(Product product, double amount) {
-        if (wallet.hasAmountMoney(amount)) {
-            wallet.withdraw(amount);
-            product.pay(amount);
-            System.out.println("Оплата с кошелька успешна!");
-            return true;
+        try {
+            if (wallet.hasAmountMoney(amount)) {
+                wallet.withdraw(amount);
+                product.pay(amount);
+                System.out.println("Оплата с кошелька успешна!");
+                return true;
+            }
+            System.out.println("Недостаточно средств в кошельке!");
+            return false;
+        } catch (InsufficientFundsException e) {
+            System.out.println("Ошибка оплаты: " + e.getMessage());
+            return false;
         }
-        System.out.println("Недостаточно средств в кошельке!");
-        return false;
     }
 
     @Override
