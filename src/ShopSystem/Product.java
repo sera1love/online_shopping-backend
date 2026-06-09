@@ -1,5 +1,6 @@
 package ShopSystem;
 
+import ShopSystem.Exception.InvalidPriceException;
 import ShopSystem.Exception.InvalidQuantityException;
 import ShopSystem.Exception.ProductOutOfStockException;
 import ShopSystem.interface_OJnS.Payable;
@@ -20,6 +21,7 @@ public abstract class Product implements Payable {
     }
 
     public Product(String title, double price, String description, int quantity) {
+        if (price < 0) throw new InvalidPriceException(price);
         this.id = idCounter++;
         this.title = title;
         this.price = price;
@@ -72,7 +74,8 @@ public abstract class Product implements Payable {
     }
 
     public void setQuantity(int quantity) {
-        this.quantity = Math.max(0, quantity);
+        if (quantity < 0) throw new InvalidQuantityException(quantity);
+        this.quantity = quantity;
     }
 
     public void addQuantity(int amount) {
@@ -100,6 +103,7 @@ public abstract class Product implements Payable {
     }
 
     public void setPrice(double price) {
+        if (price < 0) throw new InvalidPriceException(price);
         this.price = price;
     }
 

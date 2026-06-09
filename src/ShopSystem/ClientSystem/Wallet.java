@@ -54,19 +54,13 @@ public class Wallet implements Finansable {
     public boolean withdraw(double amount) {
         boolean success = false;
         try {
-            if (amount <= 0) {
-                throw new InvalidAmountException(amount);
-            }
-            if (!hasAmountMoney(amount)) {
-                throw new InsufficientFundsException(balance, amount);
-            }
+            if (amount <= 0) throw new InvalidAmountException(amount);
+            if (!hasAmountMoney(amount)) throw new InsufficientFundsException(balance, amount);
             balance -= amount;
             success = true;
             return true;
-        } catch (ShopSystemException e) {
-            System.out.println("Ошибка списания: " + e.getMessage());
-            return false;
         } finally {
+            // finally выполнится в любом случае (и при успехе, и при throw)
             System.out.println("[ЛОГ Wallet] Попытка списания " + amount + "р. Успех: " + success);
         }
     }

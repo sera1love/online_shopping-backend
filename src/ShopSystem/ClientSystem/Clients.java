@@ -1,7 +1,6 @@
 package ShopSystem.ClientSystem;
 
-import ShopSystem.Exception.InsufficientFundsException;
-import ShopSystem.Exception.ProductOutOfStockException;
+import ShopSystem.Exception.*;
 import ShopSystem.Product;
 import ShopSystem.ShopInventory;
 import ShopSystem.Pattern.Factories.ProductFactory;
@@ -385,5 +384,36 @@ public class Clients {
         int val = scanner.nextInt();
         scanner.nextLine();
         return Math.max(min, Math.min(max, val));
+    }
+
+    public static void transferMoney() {
+        if (currentClient == null) throw new ClientNotInitializedException();
+
+        showAllClients();
+        System.out.print("Введите ID получателя (0 - отмена): ");
+        int targetId = getIntInput("", 0, Integer.MAX_VALUE);
+        if (targetId == 0) return;
+
+        System.out.print("Сумма перевода (р): ");
+        double amount = readDouble(0.01); // readDouble должен требовать > 0
+        scanner.nextLine();
+
+        // Логика перевода с выбросом исключений
+        Client target = clients.stream()
+                .filter(c -> c.getId() == targetId)
+                .findFirst()
+                .orElseThrow(() -> new ClientNotFoundException(targetId)); // <-- Бросаем, если не найден
+
+        if (target == currentClient) {
+            throw new SelfTransferException(); // <-- Бросаем, если переводит сам себе
+        }
+
+        if (!currentClient.getWallet().hasAmountMoney(amount)) {
+            throw new InsufficientFundsException(currentClient.getWallet().checkBalance(), amount);
+        }
+
+        currentClient.getWallet().withdraw(amount);
+        target.getWallet().deposit(amount);
+        System.out.printf("Перевод %.2fр клиенту '%s' успешен!\n", amount, target.getName());
     }
 }

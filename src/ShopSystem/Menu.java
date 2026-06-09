@@ -1,6 +1,9 @@
 package ShopSystem;
 
 import ShopSystem.ClientSystem.Clients;
+import ShopSystem.Exception.EmptyInventoryException;
+import ShopSystem.Exception.InvalidMenuChoiceException;
+import ShopSystem.Exception.ShopSystemException;
 import ShopSystem.interface_OJnS.ClientStatus;
 import ShopSystem.interface_OJnS.StatusValidator;
 
@@ -12,31 +15,40 @@ public class Menu {
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void start() {
-        if (!Clients.isInitialized()) {
-            Clients.initClient();
-        }
+        if (!Clients.isInitialized()) Clients.initClient();
 
         boolean running = true;
         while (running) {
             printMenu();
-            int choice = getIntInput("Выберите действие: ", 1, 12);
-            switch (choice) {
-                case 1 -> Catalog.getInstance().showCategories();
-                case 2 -> ShopInventory.printAll();
-                case 3 -> sortProducts();
-                case 4 -> compareProducts();
-                case 5 -> Clients.purchaseMenu();
-                case 6 -> Clients.showPurchaseHistory();
-                case 7 -> Clients.topUpBalance();
-                case 8 -> Clients.advancedProductFilter();
-                case 9 -> checkClientStatusMenu();
-                case 10 -> findExtremes();
-                case 11 -> manageClientsMenu(); // Вход в подменю
-                case 12 -> {
-                    System.out.println("Выход из программы.");
-                    running = false;
-                }
+            int choice;
+            try {
+                choice = getIntInput("Выберите действие: ", 1, 12);
+            } catch (InvalidMenuChoiceException e) {
+                System.out.println("Ошибка " + e.getMessage());
+                continue;
             }
+
+            try {
+                switch (choice) {
+                    case 1 -> Catalog.getInstance().showCategories();
+                    case 2 -> ShopInventory.printAll();
+                    case 3 -> sortProducts();
+                    case 4 -> compareProducts();
+                    case 5 -> Clients.purchaseMenu();
+                    case 6 -> Clients.showPurchaseHistory();
+                    case 7 -> Clients.topUpBalance();
+                    case 8 -> Clients.advancedProductFilter();
+                    case 9 -> checkClientStatusMenu();
+                    case 10 -> findExtremes();
+                    case 11 -> manageClientsMenu();
+                    case 12 -> { System.out.println("Выход."); running = false; }
+                }
+            } catch (ShopSystemException e) { // Ловим все наши кастомные исключения
+                System.out.println("Ошибка операции: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Критическая ошибка: " + e.getMessage());
+            }
+
             if (running) System.out.println("=".repeat(50));
         }
     }
@@ -115,9 +127,11 @@ public class Menu {
     }
 
     private static void sortProducts() {
-        List<Product> sorted = ShopInventory.getProducts();
-        if (sorted.isEmpty()) { System.out.println("Нет товаров для сортировки."); return; }
-        System.out.println("""
+        try {
+            ShopInventory.checkEmpty(); // <-- Бросит EmptyInventoryException, если пусто
+            List<Product> sorted = ShopInventory.getProducts();
+            if (sorted.isEmpty()) { System.out.println("Нет товаров для сортировки."); return; }
+            System.out.println("""
         СОРТИРОВКА ТОВАРОВ:
         1) По цене (возрастание)
         2) По цене (убывание)
@@ -125,16 +139,19 @@ public class Menu {
         4) Только электроника
         5) Только товары для сада
         """);
-        int sortChoice = getIntInput("Ваш выбор: ", 1, 5);
-        switch (sortChoice) {
-            case 1 -> sorted.sort(Comparator.comparingDouble(Product::getPrice));
-            case 2 -> sorted.sort(Comparator.comparingDouble(Product::getPrice).reversed());
-            case 3 -> sorted.sort(Comparator.comparing(Product::getTitle, String.CASE_INSENSITIVE_ORDER));
-            case 4 -> sorted.removeIf(p -> !(p instanceof Electronic));
-            case 5 -> sorted.removeIf(p -> !(p instanceof GardenItem));
+            int sortChoice = getIntInput("Ваш выбор: ", 1, 5);
+            switch (sortChoice) {
+                case 1 -> sorted.sort(Comparator.comparingDouble(Product::getPrice));
+                case 2 -> sorted.sort(Comparator.comparingDouble(Product::getPrice).reversed());
+                case 3 -> sorted.sort(Comparator.comparing(Product::getTitle, String.CASE_INSENSITIVE_ORDER));
+                case 4 -> sorted.removeIf(p -> !(p instanceof Electronic));
+                case 5 -> sorted.removeIf(p -> !(p instanceof GardenItem));
+            }
+            System.out.println("Отсортированный список:");
+            sorted.forEach(Product::showInfo);
+        } catch (EmptyInventoryException e) {
+            System.out.println("Ошибка " + e.getMessage());
         }
-        System.out.println("Отсортированный список:");
-        sorted.forEach(Product::showInfo);
     }
 
     private static void compareProducts() {
@@ -162,11 +179,15 @@ public class Menu {
     private static int getIntInput(String prompt, int min, int max) {
         System.out.print(prompt);
         while (!scanner.hasNextInt()) {
-            System.out.print("Введите число от " + min + " до " + max + ": ");
+            System.out.print("Введите целое число: ");
             scanner.next();
         }
         int val = scanner.nextInt();
         scanner.nextLine();
-        return Math.max(min, Math.min(max, val));
+
+        if (val < min || val > max) {
+            throw new InvalidMenuChoiceException(val, min, max);
+        }
+        return val;
     }
 }

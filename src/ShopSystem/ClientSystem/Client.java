@@ -36,39 +36,29 @@ public class Client extends Person {
 
     public boolean buyProduct(Product product, int quantity) {
         try {
-            if (clientStatus == ClientStatus.BLOCKED) {
-                throw new ClientBlockedException(getName());
-            }
-
-            if (product == null) {
-                throw new ProductNotFoundException("null");
-            }
-
-            if (quantity <= 0) {
-                throw new InvalidQuantityException(quantity);
-            }
-
-            if (!product.isInStock()) {
-                throw new ProductOutOfStockException(0, quantity);
-            }
-
-            if (product.getQuantity() < quantity) {
-                throw new ProductOutOfStockException(product.getQuantity(), quantity);
-            }
+            if (clientStatus == ClientStatus.BLOCKED) throw new ClientBlockedException(getName());
+            if (product == null) throw new ProductNotFoundException("null");
+            if (quantity <= 0) throw new InvalidQuantityException(quantity);
+            if (!product.isInStock()) throw new ProductOutOfStockException(0, quantity);
+            if (product.getQuantity() < quantity) throw new ProductOutOfStockException(product.getQuantity(), quantity);
 
             double totalPrice = product.getFinalPrice() * quantity;
+
+            // ЯВНАЯ ПРОВЕРКА ДЕНЕГ
+            if (!wallet.hasAmountMoney(totalPrice)) {
+                throw new InsufficientFundsException(wallet.checkBalance(), totalPrice);
+            }
 
             if (wallet.withdraw(totalPrice)) {
                 product.pay(totalPrice, quantity);
                 purchaseHistory.add(new PurchaseRecord(product, totalPrice, quantity, OrderStatus.NEW));
-                System.out.printf("Покупка успешна! Куплено: %d шт. | Списание: %.2fр%n",
-                        quantity, totalPrice);
+                System.out.printf("Покупка успешна! Куплено: %d шт. | Списание: %.2fр%n", quantity, totalPrice);
                 return true;
             }
             return false;
 
-        } catch (ClientBlockedException | ProductNotFoundException |
-                 ProductOutOfStockException | InvalidQuantityException e) {
+        } catch (ClientBlockedException | ProductNotFoundException | ProductOutOfStockException |
+                 InvalidQuantityException | InsufficientFundsException e) { // <-- ДОБАВИЛИ InsufficientFundsException
             System.out.println("Ошибка покупки: " + e.getMessage());
             return false;
         } catch (Exception e) {

@@ -1,5 +1,7 @@
 package ShopSystem;
 
+import ShopSystem.Exception.EmptyInventoryException;
+import ShopSystem.Exception.NullProductException;
 import ShopSystem.Pattern.Factories.ProductFactory;
 import ShopSystem.Exception.InvalidProductTypeException;
 import java.util.ArrayList;
@@ -14,9 +16,13 @@ public class ShopInventory {
 
     public static void addProduct(Product product) {
         if (product == null) {
-            throw new IllegalArgumentException("Нельзя добавить null в инвентарь!");
+            throw new NullProductException(); // <-- БЫЛО IllegalArgumentException
         }
         products.add(product);
+    }
+
+    public static void checkEmpty() {
+        if (products.isEmpty()) throw new EmptyInventoryException();
     }
 
     public static List<Product> getProducts() {

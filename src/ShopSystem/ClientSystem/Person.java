@@ -1,5 +1,7 @@
 package ShopSystem.ClientSystem;
 
+import ShopSystem.Exception.InvalidClientDataException;
+
 import java.util.Objects;
 
 public class Person {
@@ -10,10 +12,10 @@ public class Person {
 
     public Person(String name, String phone) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Имя не может быть пустым!");
+            throw new InvalidClientDataException("Имя не может быть пустым!");
         }
         if (phone == null || phone.trim().isEmpty()) {
-            throw new IllegalArgumentException("Телефон не может быть пустым!");
+            throw new InvalidClientDataException("Телефон не может быть пустым!");
         }
 
         this.id = idGen++;
@@ -24,12 +26,14 @@ public class Person {
     public int getId() { return id; }
     public String getName() { return name; }
     public void setName(String name) {
-        if (name == null || name.trim().isEmpty()) throw new IllegalArgumentException("Имя пустое");
+        if (name == null || name.trim().isEmpty())
+            throw new InvalidClientDataException("Имя пустое");
         this.name = name;
     }
     public String getPhone() { return phone; }
     public void setPhone(String phone) {
-        if (phone == null || phone.trim().isEmpty()) throw new IllegalArgumentException("Телефон пустой");
+        if (phone == null || phone.trim().isEmpty())
+            throw new InvalidClientDataException("Телефон пустой");
         this.phone = phone;
     }
 
