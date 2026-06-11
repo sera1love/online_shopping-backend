@@ -1,9 +1,9 @@
-package ShopSystem;
+package ShopSystem.Categories;
 
 import ShopSystem.Exception.EmptyInventoryException;
 import ShopSystem.Exception.NullProductException;
 import ShopSystem.Pattern.Factories.ProductFactory;
-import ShopSystem.Exception.InvalidProductTypeException;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

@@ -1,4 +1,4 @@
-package ShopSystem;
+package ShopSystem.Categories;
 import java.util.Objects;
 
 public abstract class Category implements Comparable<Category> {

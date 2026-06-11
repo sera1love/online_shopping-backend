@@ -1,6 +1,6 @@
 package ShopSystem.Pattern.Strategy;
 
-import ShopSystem.Product;
+import ShopSystem.Categories.Product;
 import ShopSystem.ClientSystem.Wallet;
 import ShopSystem.Exception.InsufficientFundsException;
 

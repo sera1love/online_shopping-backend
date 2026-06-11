@@ -1,6 +1,12 @@
-package ShopSystem;
+package ShopSystem.StartUp;
 
 import ShopSystem.Pattern.Factories.ProductFactory;
+import ShopSystem.Categories.Catalog;
+import ShopSystem.Categories.Category;
+import ShopSystem.Categories.Product;
+import ShopSystem.Categories.ShopInventory;
+import ShopSystem.interface_OJnS.Menu;
+
 import java.util.Random;
 
 

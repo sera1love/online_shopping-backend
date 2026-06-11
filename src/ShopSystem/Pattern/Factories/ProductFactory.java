@@ -1,7 +1,10 @@
 package ShopSystem.Pattern.Factories;
 
-import ShopSystem.*;
 import ShopSystem.Exception.InvalidProductTypeException;
+import ShopSystem.Categories.Products.Electronic;
+import ShopSystem.Categories.Products.GardenItem;
+import ShopSystem.Categories.Products.MobileDevice;
+import ShopSystem.Categories.Product;
 
 public class ProductFactory {
     public static Product createProduct(String type, String title, double price, String description) {

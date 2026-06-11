@@ -1,6 +1,6 @@
 package ShopSystem.ClientSystem;
 
-import ShopSystem.Product;
+import ShopSystem.Categories.Product;
 import ShopSystem.Exception.*;
 import ShopSystem.interface_OJnS.ClientStatus;
 import ShopSystem.interface_OJnS.OrderStatus.OrderStatus;
@@ -44,7 +44,6 @@ public class Client extends Person {
 
             double totalPrice = product.getFinalPrice() * quantity;
 
-            // ЯВНАЯ ПРОВЕРКА ДЕНЕГ
             if (!wallet.hasAmountMoney(totalPrice)) {
                 throw new InsufficientFundsException(wallet.checkBalance(), totalPrice);
             }
@@ -58,7 +57,7 @@ public class Client extends Person {
             return false;
 
         } catch (ClientBlockedException | ProductNotFoundException | ProductOutOfStockException |
-                 InvalidQuantityException | InsufficientFundsException e) { // <-- ДОБАВИЛИ InsufficientFundsException
+                 InvalidQuantityException | InsufficientFundsException e) {
             System.out.println("Ошибка покупки: " + e.getMessage());
             return false;
         } catch (Exception e) {

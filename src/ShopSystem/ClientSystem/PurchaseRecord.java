@@ -1,6 +1,6 @@
 package ShopSystem.ClientSystem;
 
-import ShopSystem.Product;
+import ShopSystem.Categories.Product;
 import ShopSystem.interface_OJnS.OrderStatus.OrderStatus;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

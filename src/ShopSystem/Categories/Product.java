@@ -1,4 +1,4 @@
-package ShopSystem;
+package ShopSystem.Categories;
 
 import ShopSystem.Exception.InvalidPriceException;
 import ShopSystem.Exception.InvalidQuantityException;

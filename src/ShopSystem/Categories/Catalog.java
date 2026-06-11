@@ -1,4 +1,4 @@
-package ShopSystem;
+package ShopSystem.Categories;
 
 import java.util.ArrayList;
 import java.util.List;

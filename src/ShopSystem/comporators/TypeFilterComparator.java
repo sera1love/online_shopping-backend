@@ -1,5 +1,5 @@
 package ShopSystem.comporators;
-import ShopSystem.Product;
+import ShopSystem.Categories.Product;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

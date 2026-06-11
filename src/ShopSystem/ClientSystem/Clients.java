@@ -1,8 +1,8 @@
 package ShopSystem.ClientSystem;
 
 import ShopSystem.Exception.*;
-import ShopSystem.Product;
-import ShopSystem.ShopInventory;
+import ShopSystem.Categories.Product;
+import ShopSystem.Categories.ShopInventory;
 import ShopSystem.Pattern.Factories.ProductFactory;
 import ShopSystem.Pattern.Factories.ClientFactory;
 import ShopSystem.Pattern.Strategy.PaymentStrategy;

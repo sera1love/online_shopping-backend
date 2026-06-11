@@ -1,6 +1,6 @@
 package ShopSystem.Pattern.Strategy;
 
-import ShopSystem.Product;
+import ShopSystem.Categories.Product;
 
 public class CreditCardPayment implements PaymentStrategy {
     @Override

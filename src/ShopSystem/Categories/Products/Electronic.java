@@ -1,4 +1,6 @@
-package ShopSystem;
+package ShopSystem.Categories.Products;
+
+import ShopSystem.Categories.Product;
 
 public class Electronic extends Product {
     public Electronic(String title, double price, String description) {

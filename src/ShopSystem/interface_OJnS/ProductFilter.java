@@ -1,5 +1,5 @@
 package ShopSystem.interface_OJnS;
-import ShopSystem.Product;
+import ShopSystem.Categories.Product;
 import java.util.function.Predicate;
 
 @FunctionalInterface

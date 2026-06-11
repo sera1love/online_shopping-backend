@@ -1,11 +1,14 @@
-package ShopSystem;
+package ShopSystem.interface_OJnS;
 
+import ShopSystem.Categories.Catalog;
 import ShopSystem.ClientSystem.Clients;
 import ShopSystem.Exception.EmptyInventoryException;
 import ShopSystem.Exception.InvalidMenuChoiceException;
 import ShopSystem.Exception.ShopSystemException;
-import ShopSystem.interface_OJnS.ClientStatus;
-import ShopSystem.interface_OJnS.StatusValidator;
+import ShopSystem.Categories.Products.Electronic;
+import ShopSystem.Categories.Products.GardenItem;
+import ShopSystem.Categories.Product;
+import ShopSystem.Categories.ShopInventory;
 
 import java.util.Comparator;
 import java.util.List;
@@ -128,7 +131,7 @@ public class Menu {
 
     private static void sortProducts() {
         try {
-            ShopInventory.checkEmpty(); // <-- Бросит EmptyInventoryException, если пусто
+            ShopInventory.checkEmpty();
             List<Product> sorted = ShopInventory.getProducts();
             if (sorted.isEmpty()) { System.out.println("Нет товаров для сортировки."); return; }
             System.out.println("""

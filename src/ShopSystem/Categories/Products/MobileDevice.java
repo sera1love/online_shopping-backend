@@ -1,4 +1,4 @@
-package ShopSystem;
+package ShopSystem.Categories.Products;
 
 public class MobileDevice extends Electronic {
     public MobileDevice(String title, double price, String description) {

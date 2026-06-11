@@ -1,4 +1,6 @@
-package ShopSystem;
+package ShopSystem.Categories.Products;
+
+import ShopSystem.Categories.Product;
 
 public class GardenItem extends Product {
     public GardenItem(String title, double price, String description) {
